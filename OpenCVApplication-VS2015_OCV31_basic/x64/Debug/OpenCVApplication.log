@@ -1,0 +1,15 @@
+﻿  OpenCVApplication.cpp
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(88): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(89): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(90): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(91): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(92): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(93): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(94): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(95): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(96): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\an3\sem2\pi - tiberiumarita\lab-flaviuvancea\opencvapplication-vs2015_ocv31_basic\opencvapplication.cpp(199): warning C4244: 'initializing': conversion from 'double' to 'uchar', possible loss of data
+  OpenCVApplication.vcxproj -> E:\AN3\Sem2\PI - TiberiuMarita\Lab-FlaviuVancea\OpenCVApplication-VS2015_OCV31_basic\x64\Debug\OpenCVApplication.exe
+  OpenCV\dll\Debug\opencv_ffmpeg310_64.dll
+  OpenCV\dll\Debug\opencv_world310d.dll
+          2 file(s) copied.
