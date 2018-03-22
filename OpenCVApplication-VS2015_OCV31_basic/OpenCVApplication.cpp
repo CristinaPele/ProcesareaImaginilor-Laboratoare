@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "common.h"
+#include <queue>
+#include <iostream>
 
 
 bool equalColor(Vec3b col1, Vec3b col2) {
@@ -65,7 +67,6 @@ void creareImagine(){
 		}
 
 	}
-	printf("Holaa");
 	imshow("Imaginea", img);
 
 	printf("Press any key to continue ...\n");
@@ -432,7 +433,6 @@ void testVideoSequence()
 	}
 }
 
-
 void testSnap()
 {
 	VideoCapture cap(0); // open the deafult camera (i.e. the built in web cam)
@@ -536,8 +536,6 @@ void testMouseClick()
 		waitKey(0);
 	}
 }
-
-
 
 /* Histogram display function - display a histogram using bars (simlilar to L3 / PI)
 Input:
@@ -742,9 +740,6 @@ void DrawCross(Mat& img, Point p, int size, Scalar color, int thickness)
 	line(img, Point(p.x, p.y - size / 2), Point(p.x, p.y + size / 2), color, thickness, 8);
 }
 
-
-
-
 Point calculeazaCentrulDeMasa(Mat m,int A, int red, int green, int blue ) {
 	int r=0, c=0;
 
@@ -765,6 +760,7 @@ Point calculeazaCentrulDeMasa(Mat m,int A, int red, int green, int blue ) {
 }
 
 float calculeazaAxaDeAlungire(Mat m, int c, int r, int red, int green, int blue) {
+
 	long sumSus = 0, sumJos1 = 0, sumJos2 = 0;
 	for (int i = 0; i < m.rows; i++)
 		for (int j = 0; j < m.cols; j++) {
@@ -778,7 +774,7 @@ float calculeazaAxaDeAlungire(Mat m, int c, int r, int red, int green, int blue)
 	sumSus *= 2;
 	sumJos1 -= sumJos2;
 	return (atan2(sumSus, sumJos1)/2.0f) ;
-
+	
 }
 
 bool isWhite(Mat m, int i, int j) {
@@ -938,23 +934,18 @@ void computeForObject() {
 
 }
 
-
 //used for 42
-void addObjectToImage(Mat src, Mat dst, int r, int g, int b) {
-	//printf("\nred %d green %d blue %d", r, g, b);
+void addObjectToImage(Mat src, Mat dst, int r, int g, int b) {	
 	int pixel=0;
 	for (int i = 0; i < src.rows; i++)
 		for (int j = 0; j < src.cols; j++)
 			if (src.at<Vec3b>(i, j)[0] == b && src.at<Vec3b>(i, j)[1] == g && src.at<Vec3b>(i, j)[2] == r) {
 				dst.at<Vec3b>(i, j)[0] = b;
 				dst.at<Vec3b>(i, j)[1] = g;
-				dst.at<Vec3b>(i, j)[2] = r;
-				//printf("*");
-				pixel++;
+				dst.at<Vec3b>(i, j)[2] = r;			
 			}
-	printf("\n pix = %d", pixel);
-
 }
+
 //used for 42
 bool notVerified(int v[300][3], int red, int green, int blue, int len) {
 	for (int i = 0; i < len; i++)
@@ -963,6 +954,7 @@ bool notVerified(int v[300][3], int red, int green, int blue, int len) {
 	return true;
 }
 
+// used for 42
 void selectObjects() {
 
 	//citeste valori
@@ -977,7 +969,6 @@ void selectObjects() {
 	
 	int verified[300][3];
 	int len = 0;	
-	/*int inc = 0;*/ // may use them later
 
 	while (openFileDlg(fname)) {
 
@@ -1000,17 +991,15 @@ void selectObjects() {
 
 					
 					if (notVerified(verified, color[2], color[1], color[0], len)) {
-						printf("am gasit %d %d %d\n", color[2], color[1], color[0]);
 						verified[len][0] = color[0];
 						verified[len][1] = color[1];
 						verified[len][2] = color[2];
 						len++;
 						int A = computeArea(src, color[2], color[1], color[0]);
-						printf("\nA = %d ? %d", A, maxA);
-						if (ok < 6 && maxA > A ) {
-							printf("\nok");
+						Point point = calculeazaCentrulDeMasa(src, A, color[2], color[1], color[0]);
+						int orient = (calculeazaAxaDeAlungire(src, point.x, point.y, color[2], color[1], color[0])) * 180 / PI;
+						if (maxA > A && maxO > orient ) {
 							addObjectToImage(src, d, color[2], color[1], color[0]);
-							ok ++;
 						}
 					}			
 			
@@ -1022,6 +1011,159 @@ void selectObjects() {
 		
 		// Wait until user press some key
 		waitKey(0);
+	}
+}
+
+//used for 52
+void BFS(Mat src, Mat labels, bool vecinatate = false) {
+
+	int label = 0;
+
+	int di[8] = {-1, 0, 1, 0,-1,-1, 1, 1 };
+	int dj[8] = { 0,-1, 0, 1,-1, 1,-1, 1 };
+	int nLength = 4;
+	if (vecinatate)
+		nLength = 8;
+
+	for (int i = 0; i < labels.rows; i++) 
+		for (int j = 0; j < labels.cols; j++) 
+			
+			if (src.at<uchar>(i, j) == 0 && labels.at<uchar>(i, j) == 0) {
+				std::queue<Point> que;
+				label++;
+				labels.at<uchar>(i, j) = label;
+				que.push(Point(i, j));
+
+				while (!que.empty()) {
+					///printf("ok");
+					Point oldest = que.front();
+					int x = oldest.x;
+					int y = oldest.y;
+					que.pop();
+
+					for (int k = 0; k < nLength; k++)
+
+						if (src.at<uchar>(x + di[k], y + dj[k]) == 0 && labels.at<uchar>(x + di[k], y + dj[k]) == 0) {
+							labels.at<uchar>(x + di[k], y + dj[k]) = label;
+							que.push(Point(x + di[k], y + dj[k]));
+						}
+
+
+				}
+			}
+}
+
+//used for 53
+void etichetareCuDouaTreceri(Mat src, Mat labels, bool vecinatate = false) {
+
+	int di[8] = { -1, 0, 1, 0,-1,-1, 1, 1 };
+	int dj[8] = { 0,-1, 0, 1,-1, 1,-1, 1 };
+	int nLength = 4;
+	if (vecinatate)
+		nLength = 8;
+
+	int label = 0;
+	std::vector<std::vector<int>> edges;
+	edges.resize(255);
+
+	for (int i = 0; i < labels.rows; i++) 
+		for (int j = 0; j < labels.cols; j++) 
+			if (src.at<uchar>(i, j) == 0 && labels.at<uchar>(i, j) == 0) {
+				std::vector<int> L;
+
+				for (int k = 0; k < nLength; k++) {
+					// Neighbor coords
+					int x = i + di[k];
+					int y = j + dj[k];
+
+					if (x > 0 && y > 0 && x < labels.rows && y < labels.cols) {
+						if (labels.at<uchar>(x, y) > 0) {
+							L.push_back(labels.at<uchar>(x, y));
+						}
+					}
+				}
+
+				if (L.size() == 0) {
+					label++;
+					labels.at<uchar>(i, j) = label;
+				}
+				else {
+					int x = *std::min_element(L.begin(), L.end());
+					//printf("min=%d", x);
+					labels.at<uchar>(i, j) = x;
+
+					for (int y : L) 
+						if (y != x) {
+							edges[x].push_back(y);
+							edges[y].push_back(x);
+							
+						}
+				}			
+			}
+
+	int newLabel = 0;
+	std::vector<int> newLabels(label + 1, 0);
+
+	for (int i = 1; i < label; i++) 
+		if (newLabels.at(i) == 0) {
+			newLabel++;
+			std::queue<int> Q;
+			newLabels.at(i) = newLabel;
+			Q.push(i);
+			while (!Q.empty()) {
+				int x = Q.front();
+				Q.pop();
+				for (int y : edges[x])
+					if (newLabels.at(y) == 0) {
+						newLabels.at(y) = newLabel;
+						Q.push(y);
+					}
+			}
+		}
+
+	for (int i = 0; i < src.rows; i++)
+		for (int j = 0; j < src.cols; j++) {
+			labels.at<uchar>(i, j) = newLabels[labels.at<uchar>(i, j)];
+		}
+
+}
+
+// used for 52 & 53
+void generareCulori(int caz) {
+	char fname[MAX_PATH];
+	while (openFileDlg(fname))
+	{
+		Mat src = imread(fname, CV_LOAD_IMAGE_GRAYSCALE);
+		//generare paleta de culori
+		Scalar colorLUT[1000] = { 0 };
+		Scalar color;
+		for (int i = 1; i < 1000; i++) {
+			Scalar color(rand() & 255, rand() & 255, rand() & 255);
+			colorLUT[i] = color;
+		}
+
+		colorLUT[0] = Scalar(255, 255, 255); // fundalul va fi alb
+
+		Mat labels = Mat::zeros(src.size(), CV_16SC1); //matricea de etichete
+		Mat dst = Mat::zeros(src.size(), CV_8UC3); //matricea destinatie pt. afisare
+
+		//printf("ok");
+		if (caz == 1)
+			BFS(src, labels);
+		else if (caz == 2)
+			etichetareCuDouaTreceri(src, labels);
+
+		printf("\nout");
+		for (int i = 1; i < src.rows; i++)
+			for (int j = 1; j < src.cols; j++) {
+				Scalar color = colorLUT[labels.at<uchar>(i, j)]; // valabil pt. Met. 1 BFS
+				dst.at<Vec3b>(i, j)[0] = color[0];
+				dst.at<Vec3b>(i, j)[1] = color[1];
+				dst.at<Vec3b>(i, j)[2] = color[2];
+			}
+
+		imshow("Labeled", dst);
+		waitKey();
 	}
 }
 
@@ -1055,74 +1197,81 @@ int main()
 		printf("25. Is Inside\n");
 		printf("\n\n41. Compute for object\n");
 		printf("42. Selectati obiecte\n");
-		printf(" 0 - Exit\n\n");
+		printf("\n52. Etichetare imagine");
+		printf("\n53. Etichetare cu doua treceri");
+		printf("\n 0 - Exit\n\n");
 		printf("Option: ");
 		scanf("%d",&op);
 		switch (op)
 		{
-			case 1:
+			case 1 :
 				testOpenImage();
 				break;
-			case 2:
+			case 2 :
 				testOpenImagesFld();
 				break;
-			case 3:
+			case 3 :
 				testParcurgereSimplaDiblookStyle(); //diblook style
 				break;
-			case 4:
-				//testColor2Gray();
+			case 4 :
 				testBGR2HSV();
 				break;
-			case 5:
+			case 5 :
 				testResize();
 				break;
-			case 6:
+			case 6 :
 				testCanny();
 				break;
-			case 7:
+			case 7 :
 				testVideoSequence();
 				break;
-			case 8:
+			case 8 :
 				testSnap();
 				break;
-			case 9:
+			case 9 :
 				testMouseClick();
 				break;
-			case 10:
+			case 10 :
 				testNegativeImage();
 				break;
-			case 11:
+			case 11 :
 				testAdaugaValoareCuloare();
 				break;
-			case 12:
+			case 12 :
 				testMultiplicaValoareCuloare();
 				break;
-			case 13:
+			case 13 :
 				creareImagine();
 				break;
-			case 14:
+			case 14 :
 				inversa();
 				break;
-			case 21:
+			case 21 :
 				convertImageToRGB();
 				break;
-			case 22:
+			case 22 :
 				convertImageToGrayScale();
 				break;
-			case 23:
+			case 23 :
 				binarizare();
 				break;
-			case 24:
+			case 24 :
 				convertRBGtoHLS();
 				break;
 			case 25 :
 				isInside();
 				break;
-			case 41:
+			case 41 :
 				computeForObject();
 				break;
-			case 42:
+			case 42 : 
 				selectObjects();
+				break;
+			case 52 :
+				generareCulori(1);
+				break;
+			case 53 :
+				generareCulori(2);
 				break;
 		}
 	}
